@@ -9,6 +9,9 @@ public class CreatingInstances
 {
 	private ConstructorInfo _constructor;
 
+	[Params(100, 10_000)]
+	public int Count { get; set; }
+
 	[GlobalSetup]
 	public void GlobalSetup()
 	{
@@ -16,19 +19,39 @@ public class CreatingInstances
 	}
 
 	[Benchmark]
-	public R ConstructorInfo() => (R)typeof(R).GetConstructor(Type.EmptyTypes).Invoke(null);
+	public void ConstructorInfo()
+	{
+		for (int i = 0; i < Count; i++)
+			_ = typeof(R).GetConstructor(Type.EmptyTypes).Invoke(null);
+	}
+
+	[Benchmark(Baseline = true)]
+	public void New()
+	{
+		for (int i = 0; i < Count; i++)
+			_ = new R();
+	}
 
 	[Benchmark]
-	public R New() => new();
+	public void ConstructorInfo_Cached()
+	{
+		for (int i = 0; i < Count; i++)
+			_ = _constructor.Invoke(null);
+	}
 
 	[Benchmark]
-	public R Cached_ConstructorInfo() => (R)_constructor.Invoke(null);
+	public void ActivatorCreateInstance()
+	{
+		for (int i = 0; i < Count; i++)
+			_ = Activator.CreateInstance(typeof(R));
+	}
 
 	[Benchmark]
-	public R ActivatorCreateInstance() => Activator.CreateInstance<R>();
-
-	[Benchmark]
-	public R GetUninitializedObject() => (R)RuntimeHelpers.GetUninitializedObject(typeof(R));
+	public void GetUninitializedObject()
+	{
+		for (int i = 0; i < Count; i++)
+			_ = RuntimeHelpers.GetUninitializedObject(typeof(R));
+	}
 }
 
 public sealed record R();
