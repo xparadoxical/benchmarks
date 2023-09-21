@@ -1,3 +1,5 @@
+https://stackoverflow.com/a/19661491/6416482
+
 ```
 BenchmarkDotNet v0.13.7, Windows 11 (10.0.22621.2283/22H2/2022Update/SunValley2)
 Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical cores
