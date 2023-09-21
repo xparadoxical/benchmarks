@@ -2,6 +2,7 @@
 
 [MemoryDiagnoser(false)]
 [Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
+[HideColumns("RatioSD", "Alloc Ratio", "Code Size")]
 public class StreamVsSpan
 {
 	public byte[] _array;

@@ -5,6 +5,7 @@ namespace Benchmarks;
 
 [MemoryDiagnoser(false)]
 [Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
+[HideColumns("RatioSD", "Alloc Ratio", "Code Size")]
 public class CreatingInstances
 {
 	private ConstructorInfo _constructor;

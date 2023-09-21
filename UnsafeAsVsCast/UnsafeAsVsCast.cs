@@ -3,6 +3,7 @@
 namespace Benchmarks.UnsafeAsVsCast;
 
 [MemoryDiagnoser(false)]
+[HideColumns("RatioSD", "Alloc Ratio", "Code Size")]
 public class UnsafeAsVsCast
 {
 	public int[] _ints;
