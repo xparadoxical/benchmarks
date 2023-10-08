@@ -7,11 +7,15 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+using BenchmarkDotNet.Configs;
+
 namespace Benchmarks;
 
 [MemoryDiagnoser(false)]
 [ExceptionDiagnoser]
 [HideColumns("RatioSD", "Alloc Ratio", "Code Size")]
+[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+[Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.Declared)]
 public unsafe class TryMakeGenericType
 {
 	private static delegate*<Type, nint*, int, nint*, int, Type, bool> _RuntimeHandles_SatisfiesConstraints;
@@ -36,8 +40,9 @@ public unsafe class TryMakeGenericType
 			.MethodHandle.GetFunctionPointer();
 	}
 
+	[BenchmarkCategory("TryMake")]
 	[Benchmark(Baseline = true)]
-	public bool TryCatch() => TryMakeGenericType1(TypeDefinition, out _, TypeArgument);
+	public bool TryMake_TryCatch() => TryMakeGenericType1(TypeDefinition, out _, TypeArgument);
 
 	public static bool TryMakeGenericType1(Type genericType, out Type closedGenericType, params Type[] typeArguments)
 	{
@@ -53,8 +58,9 @@ public unsafe class TryMakeGenericType
 		}
 	}
 
+	[BenchmarkCategory("TryMake")]
 	[Benchmark]
-	public bool If_InternalCall() => TryMakeGenericType2(TypeDefinition, out _, TypeArgument);
+	public bool TryMake_If() => TryMakeGenericType2(TypeDefinition, out _, TypeArgument);
 
 	public static bool TryMakeGenericType2(Type genericType, out Type closedGenericType, params Type[] typeArguments)
 	{
@@ -67,6 +73,27 @@ public unsafe class TryMakeGenericType
 		closedGenericType = default;
 		return false;
 	}
+
+	[BenchmarkCategory("Check")]
+	[Benchmark(Baseline = true)]
+	public bool Check_TryCatch() => CanMakeGenericType2(TypeDefinition, TypeArgument);
+
+	public static bool CanMakeGenericType2(Type genericType, params Type[] typeArguments)
+	{
+		try
+		{
+			_ = genericType.MakeGenericType(typeArguments);
+			return true;
+		}
+		catch
+		{
+			return false;
+		}
+	}
+
+	[BenchmarkCategory("Check")]
+	[Benchmark]
+	public bool Check_InternalCall() => CanMakeGenericType(TypeDefinition, new(TypeArgument));
 
 	private static unsafe bool CanMakeGenericType(Type definition, ReadOnlySpan<Type> genericArguments)
 	{
