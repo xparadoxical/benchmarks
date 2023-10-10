@@ -1,0 +1,53 @@
+<#@ template hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+using System.Dynamic;
+
+using BenchmarkDotNet.Configs;
+
+namespace Benchmarks;
+
+[MemoryDiagnoser]
+[HideColumns("Mean", "Error", "StdDev", "Ratio", "RatioSD")]
+[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+public class DictVsExpandoObject
+{
+	public Dictionary<string, object> dict;
+	public dynamic expando;
+<#
+	for (int i = 0; i <= 10; i++)
+	{
+#>
+
+	[Benchmark]
+	[BenchmarkCategory("Dict")]
+	public void Dict_<#= i.ToString("00") #>Values()
+	{
+		dict = new Dictionary<string, object>();
+<#
+		for (int fieldNr = 1; fieldNr <= i; fieldNr++)
+		{
+#>
+		dict["field<#= fieldNr #>"] = "<#= fieldNr #>";
+<#
+		}
+#>
+	}
+
+	[Benchmark]
+	[BenchmarkCategory("ExpandoObject")]
+	public void ExpandoObject_<#= i.ToString("00") #>Fields()
+	{
+		expando = new ExpandoObject();
+<#
+		for (int fieldNr = 1; fieldNr <= i; fieldNr++)
+		{
+#>
+		expando.field<#= fieldNr #> = "<#= fieldNr #>";
+<#
+		}
+#>
+	}
+<#
+	}
+#>
+}
